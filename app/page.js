@@ -1,6 +1,6 @@
 export default function Home() {
   return (
-    <main className="min-h-screen bg-gray-100 p-8">
+    <main className="min-h-screen bg-cyan-500 p-8">
       <h1 className="text-4xl font-bold text-center text-lime-600 mb-8">
         Next.js 14 + Tailwind CSS
       </h1>

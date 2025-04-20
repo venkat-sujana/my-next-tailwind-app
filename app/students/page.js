@@ -1,5 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable"; // 🟢 Correct way
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 
 export default function StudentsPage() {
   const [students, setStudents] = useState([]);
@@ -30,6 +34,67 @@ export default function StudentsPage() {
   );
   const totalPages = Math.ceil(filteredStudents.length / studentsPerPage);
 
+  // 🟥 Export to PDF Function
+  const exportToPDF = () => {
+    const doc = new jsPDF();
+  
+    const tableColumn = [
+      "S. No",
+      "Name",
+      "Email",
+      "Age",
+      "Branch",
+      "Roll Number",
+      "Admission Year",
+    ];
+  
+    const tableRows = filteredStudents.map((student, index) => [
+      index + 1,
+      student.name,
+      student.email,
+      student.age,
+      student.branch,
+      student.rollNumber,
+      student.admissionYear,
+    ]);
+  
+    autoTable(doc, {
+      head: [tableColumn],
+      body: tableRows,
+      startY: 20,
+    });
+  
+    doc.save("student_list.pdf");
+  };
+  
+  // 🟩 Export to Excel Function
+  const exportToExcel = () => {
+    const worksheetData = filteredStudents.map((student, index) => ({
+      "S. No": index + 1,
+      Name: student.name,
+      Email: student.email,
+      Age: student.age,
+      Branch: student.branch,
+      "Roll Number": student.rollNumber,
+      "Admission Year": student.admissionYear,
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(worksheetData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Students");
+
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "array",
+    });
+
+    const data = new Blob([excelBuffer], {
+      type: "application/octet-stream",
+    });
+
+    saveAs(data, "student_list.xlsx");
+  };
+
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">Student List</h1>
@@ -45,6 +110,22 @@ export default function StudentsPage() {
           setCurrentPage(1);
         }}
       />
+
+      {/* 📤 Export Buttons */}
+      <div className="flex gap-4 mb-4">
+        <button
+          onClick={exportToPDF}
+          className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+        >
+          Export to PDF
+        </button>
+        <button
+          onClick={exportToExcel}
+          className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+        >
+          Export to Excel
+        </button>
+      </div>
 
       {/* 📋 Table */}
       <div className="overflow-x-auto">

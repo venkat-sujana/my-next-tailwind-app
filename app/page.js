@@ -1,17 +1,39 @@
-export default function Home() {
+"use client";
+import { useState } from "react";
+
+export default function AddStudent() {
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    age: "",
+    branch: "",
+    rollNumber: "",
+    admissionYear: "",
+  });
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    await fetch("/api/students", {
+      method: "POST",
+      body: JSON.stringify(form),
+    });
+    alert("Student added!");
+  };
+
   return (
-    <main className="min-h-screen bg-cyan-500 p-8">
-      <h1 className="text-4xl font-bold text-center text-lime-600 mb-8">
-        Next.js 14 + Tailwind CSS
-      </h1>
-      <div className="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden p-6">
-        <p className="text-red-700">
-          ఈ ప్రాజెక్ట్‌లో Next.js 14 మరియు Tailwind CSSని ఉపయోగించాను!
-        </p>
-        <button className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition">
-          click here
-        </button>
-      </div>
-    </main>
+    <form onSubmit={handleSubmit} className="p-4 space-y-4 bg-white shadow rounded">
+      <input name="name" placeholder="Name" onChange={handleChange} className="border p-2 w-full" />
+      <input name="email" placeholder="Email" onChange={handleChange} className="border p-2 w-full" />
+      <input name="age" placeholder="Age" onChange={handleChange} className="border p-2 w-full" />
+      <input name="branch" placeholder="Branch" onChange={handleChange} className="border p-2 w-full" />
+      <input name="rollNumber" placeholder="Roll Number" onChange={handleChange} className="border p-2 w-full" />
+      <input name="admissionYear" placeholder="Admission Year" onChange={handleChange} className="border p-2 w-full" />
+      <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">Add Student</button>
+    </form>
   );
 }
+

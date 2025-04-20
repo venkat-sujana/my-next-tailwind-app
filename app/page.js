@@ -5,11 +5,11 @@ export default function Home() {
         Next.js 14 + Tailwind CSS
       </h1>
       <div className="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden p-6">
-        <p className="text-gray-700">
+        <p className="text-red-700">
           ఈ ప్రాజెక్ట్‌లో Next.js 14 మరియు Tailwind CSSని ఉపయోగించాను!
         </p>
         <button className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition">
-          క్లిక్ చేయండి
+          click here
         </button>
       </div>
     </main>

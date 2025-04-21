@@ -37,7 +37,7 @@ export default function AddStudent() {
       <input name="rollNumber" placeholder="Roll Number" onChange={handleChange} className="border p-2 w-full" />
       <input name="admissionYear" placeholder="Admission Year" onChange={handleChange} className="border p-2 w-full" />
       <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded  ">Add Student</button>&nbsp;
-      <button  className="bg-green-500 text-white px-4 py-2 rounded"><Link href="http://localhost:3000/students" >View </Link></button>
+      <button  className="bg-green-500 text-white px-4 py-2 rounded"><Link href="https://my-next-tailwind-app-inky.vercel.app/students" >View </Link></button>
       
     </form>
     </div>

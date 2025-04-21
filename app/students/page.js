@@ -1,9 +1,16 @@
 "use client";
 import { useEffect, useState } from "react";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable"; // 🟢 Correct way
 import * as XLSX from "xlsx";
-import { saveAs } from "file-saver";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
+import {
+  Search,
+  FileSpreadsheet,
+  FileText,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
+import Link from "next/link";
 
 export default function StudentsPage() {
   const [students, setStudents] = useState([]);
@@ -16,6 +23,7 @@ export default function StudentsPage() {
       const res = await fetch("/api/students");
       const data = await res.json();
       setStudents(data);
+      // alert("Students fetched successfully!");
     };
     fetchStudents();
   }, []);
@@ -34,12 +42,20 @@ export default function StudentsPage() {
   );
   const totalPages = Math.ceil(filteredStudents.length / studentsPerPage);
 
-  // 🟥 Export to PDF Function
-  const exportToPDF = () => {
+  // ✅ Export to Excel
+  const handleExportExcel = () => {
+    const worksheet = XLSX.utils.json_to_sheet(filteredStudents);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Students");
+    XLSX.writeFile(workbook, "students.xlsx");
+  };
+
+  // ✅ Export to PDF
+  const handleExportPDF = () => {
     const doc = new jsPDF();
-  
+    doc.text("Student List", 14, 15);
     const tableColumn = [
-      "S. No",
+      "S.No",
       "Name",
       "Email",
       "Age",
@@ -47,7 +63,6 @@ export default function StudentsPage() {
       "Roll Number",
       "Admission Year",
     ];
-  
     const tableRows = filteredStudents.map((student, index) => [
       index + 1,
       student.name,
@@ -57,74 +72,50 @@ export default function StudentsPage() {
       student.rollNumber,
       student.admissionYear,
     ]);
-  
-    autoTable(doc, {
+    doc.autoTable({
       head: [tableColumn],
       body: tableRows,
       startY: 20,
     });
-  
-    doc.save("student_list.pdf");
-  };
-  
-  // 🟩 Export to Excel Function
-  const exportToExcel = () => {
-    const worksheetData = filteredStudents.map((student, index) => ({
-      "S. No": index + 1,
-      Name: student.name,
-      Email: student.email,
-      Age: student.age,
-      Branch: student.branch,
-      "Roll Number": student.rollNumber,
-      "Admission Year": student.admissionYear,
-    }));
-
-    const worksheet = XLSX.utils.json_to_sheet(worksheetData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Students");
-
-    const excelBuffer = XLSX.write(workbook, {
-      bookType: "xlsx",
-      type: "array",
-    });
-
-    const data = new Blob([excelBuffer], {
-      type: "application/octet-stream",
-    });
-
-    saveAs(data, "student_list.xlsx");
+    doc.save("students.pdf");
   };
 
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">Student List</h1>
 
-      {/* 🔍 Search */}
-      <input
-        type="text"
-        placeholder="Search by name, email, or branch..."
-        className="mb-4 p-2 border border-gray-300 rounded w-full md:w-1/2"
-        value={searchQuery}
-        onChange={(e) => {
-          setSearchQuery(e.target.value);
-          setCurrentPage(1);
-        }}
-      />
+      {/* 🔍 Search Input with Icon */}
+      <div className="relative mb-4 md:w-1/2 w-full">
+        <Search className="absolute left-3 top-2.5 text-gray-400" size={20} />
+        <input
+          type="text"
+          placeholder="Search by name, email, or branch..."
+          className="pl-10 pr-4 py-2 border border-gray-300 rounded w-full"
+          value={searchQuery}
+          onChange={(e) => {
+            setSearchQuery(e.target.value);
+            setCurrentPage(1);
+          }}
+        />
+      </div>
 
-      {/* 📤 Export Buttons */}
+      {/* 📤 Export Buttons with Icons */}
       <div className="flex gap-4 mb-4">
         <button
-          onClick={exportToPDF}
-          className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+          onClick={handleExportPDF}
+          className="flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
         >
-          Export to PDF
+          <FileText size={18} />
+          Export PDF
         </button>
         <button
-          onClick={exportToExcel}
-          className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+          onClick={handleExportExcel}
+          className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
         >
-          Export to Excel
-        </button>
+          <FileSpreadsheet size={18} />
+          Export Excel
+        </button>&nbsp;
+        <button  className="bg-blue-500 text-white px-4 py-2 rounded"><Link href="http://localhost:3000/" >Go back </Link></button>
       </div>
 
       {/* 📋 Table */}
@@ -162,9 +153,16 @@ export default function StudentsPage() {
         )}
       </div>
 
-      {/* ⏪ Pagination Controls with Page Numbers */}
+      {/* ⏪ Pagination with Icons */}
       {totalPages > 1 && (
         <div className="mt-6 flex flex-wrap justify-center gap-2">
+          <button
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            className="px-3 py-2 rounded border bg-gray-200"
+          >
+            <ChevronLeft size={18} />
+          </button>
+
           {Array.from({ length: totalPages }, (_, index) => (
             <button
               key={index + 1}
@@ -178,6 +176,15 @@ export default function StudentsPage() {
               {index + 1}
             </button>
           ))}
+
+          <button
+            onClick={() =>
+              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+            }
+            className="px-3 py-2 rounded border bg-gray-200"
+          >
+            <ChevronRight size={18} />
+          </button>
         </div>
       )}
     </div>

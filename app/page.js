@@ -48,7 +48,7 @@ export default function AddStudent() {
         <input name="admissionYear" value={form.admissionYear} placeholder="Admission Year" onChange={handleChange} className="border p-2 w-full" />
         <div className="flex gap-2">
           <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">Add Student</button>
-          <Link href="http://localhost:3000/students">
+          <Link href="https://my-next-tailwind-app-inky.vercel.app/students">
             <button type="button" className="bg-green-500 text-white px-4 py-2 rounded">View</button>
           </Link>
         </div>

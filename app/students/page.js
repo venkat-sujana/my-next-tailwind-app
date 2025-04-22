@@ -119,7 +119,7 @@ export default function StudentsPage() {
           <FileSpreadsheet size={18} />
           Export Excel
         </button>&nbsp;
-        <button  className="bg-blue-500 text-white px-4 py-2 rounded"><Link href="http:localhost:3000/" >Go back </Link></button>
+        <button  className="bg-blue-500 text-white px-4 py-2 rounded"><Link href="https://my-next-tailwind-app-inky.vercel.app/" >Go back </Link></button>
       </div>
 
       {/* 📋 Table */}

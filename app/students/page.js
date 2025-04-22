@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
-import "jspdf-autotable";
+import autoTable from "jspdf-autotable"; // ✅ Correct way
 import {
   Search,
   FileSpreadsheet,
@@ -72,13 +72,17 @@ export default function StudentsPage() {
       student.rollNumber,
       student.admissionYear,
     ]);
-    doc.autoTable({
+  
+    // ✅ use autoTable from the plugin
+    autoTable(doc, {
       head: [tableColumn],
       body: tableRows,
       startY: 20,
     });
+  
     doc.save("students.pdf");
   };
+  
 
   return (
     <div className="p-6">
@@ -115,7 +119,7 @@ export default function StudentsPage() {
           <FileSpreadsheet size={18} />
           Export Excel
         </button>&nbsp;
-        <button  className="bg-blue-500 text-white px-4 py-2 rounded"><Link href="https://my-next-tailwind-app-inky.vercel.app/" >Go back </Link></button>
+        <button  className="bg-blue-500 text-white px-4 py-2 rounded"><Link href="http:localhost:3000/" >Go back </Link></button>
       </div>
 
       {/* 📋 Table */}

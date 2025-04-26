@@ -20,15 +20,12 @@ export async function PUT(request, { params }) {
 
   return new Response(JSON.stringify(updatedStudent), { status: 200 });
 }
-
 // DELETE
 export async function DELETE(_, { params }) {
   await connectMongoDB();
   const deletedStudent = await Student.findByIdAndDelete(params.id);
-
-  if (!deletedStudent) {
+if (!deletedStudent) {
     return new Response(JSON.stringify({ error: "Student not found" }), { status: 404 });
   }
-
-  return new Response(JSON.stringify({ message: "Student deleted" }), { status: 200 });
+return new Response(JSON.stringify({ message: "Student deleted" }), { status: 200 });
 }

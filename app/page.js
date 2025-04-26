@@ -1,23 +1,21 @@
 'use client';
 import { useEffect, useState } from 'react';
+import {
+  PieChart, Pie, Cell, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer
+} from 'recharts';
+import { User,Users} from 'lucide-react';
+
 import { useRouter } from 'next/navigation';
-import jsPDF from 'jspdf';
-import autoTable from "jspdf-autotable"; // ✅ Correct way
-import * as XLSX from 'xlsx';
-import { saveAs } from 'file-saver';
-import ReactPaginate from 'react-paginate';
 
+export default function Dashboard() {
 
+  const router = useRouter(); // ✅ Initialize the router
 
-export default function StudentsPage() {
   const [students, setStudents] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [currentPage, setCurrentPage] = useState(0);
-  const studentsPerPage = 5;
-  const router = useRouter();
+  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
   const fetchStudents = async () => {
-    const res = await fetch('https://my-next-tailwind-app-inky.vercel.app/api/students');
+    const res = await fetch('http://localhost:3000/api/students');
     const data = await res.json();
     setStudents(data);
   };
@@ -26,136 +24,119 @@ export default function StudentsPage() {
     fetchStudents();
   }, []);
 
-  const handleDelete = async (id) => {
-    if (confirm('Are you sure to delete?')) {
-      await fetch(`https://my-next-tailwind-app-inky.vercel.app/api/students/${id}`, { method: 'DELETE' });
-      fetchStudents();
-    }
-  };
+  const totalStudents = students.length;
+  const branches = [...new Set(students.map(s => s.branch))];
+  const branchCount = branches.map(branch => ({
+    name: branch,
+    value: students.filter(s => s.branch === branch).length,
+  }));
 
-   // ✅ Export to PDF
-   const handleExportPDF = () => {
-    const doc = new jsPDF();
-    doc.text("Student List", 14, 15);
-    const tableColumn = [
-      "S.No",
-      "Name",
-      "Email",
-      "Age",
-      "Branch",
-      "Roll Number",
-      "Admission Year",
-    ];
-    const tableRows = filteredStudents.map((student, index) => [
-      index + 1,
-      student.name,
-      student.email,
-      student.age,
-      student.branch,
-      student.rollNumber,
-      student.admissionYear,
-    ]);
-  
-    // ✅ use autoTable from the plugin
-    autoTable(doc, {
-      head: [tableColumn],
-      body: tableRows,
-      startY: 20,
-    });
-  
-    doc.save("students.pdf");
-  };
-  const handleExportExcel = () => {
-    const ws = XLSX.utils.json_to_sheet(filteredStudents);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Students');
-    const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-    const data = new Blob([excelBuffer], { type: 'application/octet-stream' });
-    saveAs(data, 'students.xlsx');
-  };
-
-  const filteredStudents = students.filter((s) =>
-    s.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const pageCount = Math.ceil(filteredStudents.length / studentsPerPage);
-  const offset = currentPage * studentsPerPage;
-  const currentStudents = filteredStudents.slice(offset, offset + studentsPerPage);
-
-  const handlePageChange = ({ selected }) => {
-    setCurrentPage(selected);
-  };
+  const yearCount = [...new Set(students.map(s => s.admissionYear))].map(year => ({
+    year: year,
+    count: students.filter(s => s.admissionYear === year).length,
+  }));
 
   return (
-    <div className="max-w-6xl mx-auto mt-10 p-4">
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">All Students</h1>
-        <div className="flex gap-2">
-          <button onClick={() => router.push('/add-student')} className="bg-green-600 text-white px-4 py-2 rounded">+ Add Student</button>
-          <button onClick={handleExportPDF} className="bg-blue-500 text-white px-4 py-2 rounded">Export PDF</button>
-          <button onClick={handleExportExcel} className="bg-yellow-500 text-white px-4 py-2 rounded">Export Excel</button>
+
+
+<div className="max-w-7xl mx-auto p-6">
+      <h1 className="text-3xl font-bold mb-6 text-center">Student Dashboard</h1>
+
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Add Student */}
+        <div className="bg-white p-6 rounded-2xl shadow-md hover:shadow-lg transition">
+          <h2 className="text-xl font-semibold mb-2">Add New Student</h2>
+          <p className="text-gray-600 mb-4">Register a new student into the system.</p>
+          <button
+            onClick={() => router.push('/add-student')}
+            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 cursor-pointer"
+          >
+            Go to Form
+          </button>
+        </div>
+
+        {/* View All Students */}
+        <div className="bg-white p-6 rounded-2xl shadow-md hover:shadow-lg transition">
+          <h2 className="text-xl font-semibold mb-2">All Students</h2>
+          <p className="text-gray-600 mb-4">View, edit, or delete student records.</p>
+          <button
+            onClick={() => router.push('/student-table')}
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 cursor-pointer"
+          >
+            View Table
+          </button>
         </div>
       </div>
 
-      <input
-        type="text"
-        placeholder="Search by name..."
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        className="border px-3 py-2 mb-4 w-full rounded"
-      />
 
-      <table className="min-w-full bg-white shadow rounded-lg ">
-        <thead className="bg-gray-200 border-t">
-          <tr className="bg-gray-200 border-t" >
-            <th className="px-4 py-2 text-left">S.No</th>
-            <th className="px-4 py-2 text-left">Name</th>
-            <th className="px-4 py-2 text-left">Email</th>
-            <th className="px-4 py-2 text-left">Age</th>
-            <th className="px-4 py-2 text-left">Branch</th>
-            <th className="px-4 py-2 text-left">Roll</th>
-            <th className="px-4 py-2 text-left">Year</th>
-            <th className="px-4 py-2 text-left">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {currentStudents.map((student, index) => (
-            <tr key={student._id} className="border-t text-center">
-              <td className="px-4 py-2">{offset + index + 1}</td>
-              <td className="px-4 py-2">{student.name}</td>
-              <td className="px-4 py-2">{student.email}</td>
-              <td className="px-4 py-2">{student.age}</td>
-              <td className="px-4 py-2">{student.branch}</td>
-              <td className="px-4 py-2">{student.rollNumber}</td>
-              <td className="px-4 py-2">{student.admissionYear}</td>
-              <td className="space-x-2">
-                <button onClick={() => router.push(`/edit-student/${student._id}`)} className="text-blue-600 ">Edit</button>
-                <button onClick={() => handleDelete(student._id)} className="text-red-600 ">Delete</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      {filteredStudents.length === 0 && (
-          <p className="text-center text-gray-500 mt-4">No students found.</p>
-        )}
-
-
-      {/* Pagination */}
-      <div className="mt-4 flex justify-center">
-        <ReactPaginate
-          pageCount={pageCount}
-          onPageChange={handlePageChange}
-          containerClassName="flex space-x-2"
-          activeClassName="font-bold text-blue-600"
-          previousLabel=""
-          nextLabel=""
-          breakLabel="..."
-          pageRangeDisplayed={3}
-          marginPagesDisplayed={1}
-          pageClassName="px-3 py-1 border rounded"
-        />
+{/* Tiles */}
+ <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
+        <div className="bg-blue-500 text-white p-6 rounded-2xl shadow-md">
+          <h2 className="text-xl font-semibold flex items-center"><Users size={30} color='white'/>Total Students</h2>
+          <p className="text-3xl mt-2">{totalStudents}</p>
+        </div>
+        <div className="bg-green-500 text-white p-6 rounded-2xl shadow-md">
+          <h2 className="text-xl font-semibold">Branches</h2>
+          <p className="text-3xl mt-2">{branches.length}</p>
+        </div>
+        <div className="bg-yellow-500 text-white p-6 rounded-2xl shadow-md">
+          <h2 className="text-xl font-semibold">Years</h2>
+          <p className="text-3xl mt-2">{[...new Set(students.map(s => s.admissionYear))].length}</p>
+        </div>
       </div>
-    </div>
-  );
+
+      {/* Charts */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+       
+        {/* Table instead of Pie Chart */}
+        <div className="bg-white p-6 rounded-2xl shadow-md">
+  <h3 className="text-xl font-semibold mb-4">Students by Branch</h3>
+  <table className="min-w-full bg-white border rounded-lg overflow-hidden">
+    <thead>
+      <tr className="bg-gray-200 text-gray-700">
+        <th className="px-4 py-2 text-left border">S.No</th>
+        <th className="px-4 py-2 text-left border">Branch</th>
+        <th className="px-4 py-2 text-left border">Count</th>
+      </tr>
+    </thead>
+    <tbody>
+      {branchCount.map((item, index) => (
+        <tr
+          key={index}
+          className={`border-t ${index % 2 === 0 ? 'bg-gray-50' : 'bg-gray-100'}`}
+        >
+          <td className="px-4 py-2 border text-gray-700">{index + 1}</td>
+          <td className="px-4 py-2 border font-semibold text-gray-800">{item.name}</td>
+          <td className="px-4 py-2 border text-gray-800 font-semibold">{item.value}</td>
+        </tr>
+      ))}
+
+      {/* Total Row */}
+      <tr className="bg-green-100 border-t-2 border-green-400">
+        <td className="px-4 py-2 font-bold text-green-800 border" colSpan={2}>Total</td>
+        <td className="px-4 py-2 font-bold text-green-800 border">
+          {branchCount.reduce((total, item) => total + item.value, 0)}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+{/* Bar Chart */}
+        <div className="bg-white p-6 rounded-2xl shadow-md">
+          <h3 className="text-xl font-semibold mb-4">Students by Admission Year</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={yearCount}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="year" />
+              <YAxis allowDecimals={false} />
+              <Tooltip />
+              <Bar dataKey="count" fill="#82ca9d" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+ </div>
+ );
 }

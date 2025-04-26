@@ -1,9 +1,8 @@
-
-import connectMongoDB from "@/lib/db";
-import Student from "@/models/Student";
+import  connectMongoDB  from "@/lib/db";
+import  Student  from "@/models/Student";
 
 export async function GET() {
-  console.log("GET https://my-next-tailwind-app-inky.vercel.app/api/students");
+  console.log("GET http://localhost:3000/api/students");
   await connectMongoDB();
   console.log("Connected to MongoDB");
   const students = await Student.find();
@@ -12,7 +11,7 @@ export async function GET() {
 }
 
 export async function POST(request) {
-  console.log("POST https://my-next-tailwind-app-inky.vercel.app/api/students");
+  console.log("POST http://localhost:3000/api/students");
   await connectMongoDB();
   console.log("Connected to MongoDB");
   const data = await request.json();
@@ -21,6 +20,7 @@ export async function POST(request) {
   console.log("Created new student with id", newStudent._id);
   return new Response(JSON.stringify(newStudent), { status: 201 });
 }
+
 
 
 

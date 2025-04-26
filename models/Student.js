@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-
 const StudentSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -29,5 +28,4 @@ const StudentSchema = new mongoose.Schema({
     required: true,
   },
 }, { timestamps: true });
-
 export default mongoose.models.Student || mongoose.model("Student", StudentSchema);

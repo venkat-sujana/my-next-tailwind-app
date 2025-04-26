@@ -16,7 +16,7 @@ export default function EditStudentPage() {
 
   useEffect(() => {
     const fetchStudent = async () => {
-      const res = await fetch(`https://my-next-tailwind-app-inky.vercel.app/api/students/${id}`);
+      const res = await fetch(` http://localhost:3000/api/students/${id}`);
       const data = await res.json();
       setFormData(data);
     };
@@ -29,13 +29,13 @@ export default function EditStudentPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const res = await fetch(`https://my-next-tailwind-app-inky.vercel.app/api/students/${id}`, {
+    const res = await fetch(`http://localhost:3000/api/students/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(formData)
     });
     if (res.ok) {
-      router.push('/');
+      router.push('/student-table');
     } else {
       alert('Failed to update student');
     }
@@ -45,7 +45,7 @@ export default function EditStudentPage() {
     <div className="max-w-xl mx-auto mt-10 p-4 border rounded shadow">
       <h1 className="text-2xl font-bold mb-4">Edit Student</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
-        {['name', 'email', 'age', 'branch', 'rollNumber', 'admissionYear'].map((field) => (
+        {['name', 'email',  'age', 'branch', 'rollNumber', 'admissionYear'].map((field) => (
           <div key={field}>
             <label className="block capitalize">{field}</label>
             <input
@@ -58,7 +58,7 @@ export default function EditStudentPage() {
             />
           </div>
         ))}
-        <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">Update</button>
+        <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded cursor-pointer">Update</button>
       </form>
     </div>
   );

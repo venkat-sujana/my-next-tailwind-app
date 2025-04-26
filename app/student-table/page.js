@@ -19,7 +19,7 @@ export default function StudentsPage() {
   const router = useRouter();
 
   const fetchStudents = async () => {
-    const res = await fetch('http://localhost:3000/api/students');
+    const res = await fetch('https://my-next-tailwind-app-inky.vercel.app/api/students');
     const data = await res.json();
     setStudents(data);
   };
@@ -30,7 +30,7 @@ export default function StudentsPage() {
 
   const handleDelete = async (id) => {
     if (confirm('Are you sure to delete?')) {
-      await fetch(`http://localhost:3000/api/students/${id}`, { method: 'DELETE' });
+      await fetch(`https://my-next-tailwind-app-inky.vercel.app/api/students/${id}`, { method: 'DELETE' });
       fetchStudents();
     }
   };

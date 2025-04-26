@@ -21,7 +21,7 @@ export default function AddStudentPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const res = await fetch(' http://localhost:3000/api/students', {
+    const res = await fetch(' https://my-next-tailwind-app-inky.vercel.app/api/students', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(formData)

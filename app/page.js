@@ -15,7 +15,7 @@ export default function Dashboard() {
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
   const fetchStudents = async () => {
-    const res = await fetch('http://localhost:3000/api/students');
+    const res = await fetch('https://my-next-tailwind-app-inky.vercel.app/api/students');
     const data = await res.json();
     setStudents(data);
   };

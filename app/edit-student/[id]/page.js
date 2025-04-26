@@ -16,7 +16,7 @@ export default function EditStudentPage() {
 
   useEffect(() => {
     const fetchStudent = async () => {
-      const res = await fetch(` http://localhost:3000/api/students/${id}`);
+      const res = await fetch(`https://my-next-tailwind-app-inky.vercel.app/api/students/${id}`);
       const data = await res.json();
       setFormData(data);
     };
@@ -29,7 +29,7 @@ export default function EditStudentPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const res = await fetch(`http://localhost:3000/api/students/${id}`, {
+    const res = await fetch(`https://my-next-tailwind-app-inky.vercel.app/api/students/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(formData)

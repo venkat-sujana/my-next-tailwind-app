@@ -1,23 +1,26 @@
-import  connectMongoDB  from "@/lib/db";
-import  Student  from "@/models/Student";
+import connectMongoDB from "@/lib/db";
+import Student from "@/models/Student";
 
 export async function GET() {
-  console.log("GET https://my-next-tailwind-app-inky.vercel.app/api/students");
+  console.log("GET http://localhost:3000/api/students");
   await connectMongoDB();
-  console.log("Connected to MongoDB");
-  const students = await Student.find();
-  console.log("Found", students.length, "students");
+  const students = await Student.find().select('name email age branch rollNumber admissionYear gender caste'); // Explicitly select fields
   return new Response(JSON.stringify(students), { status: 200 });
 }
 
 export async function POST(request) {
-  console.log("POST https://my-next-tailwind-app-inky.vercel.app/api/students");
   await connectMongoDB();
-  console.log("Connected to MongoDB");
   const data = await request.json();
-  console.log("Received student data:", data);
+  
+  // Validation for required fields (including gender and caste)
+  if (!data.gender || !data.caste) {
+    return new Response(
+      JSON.stringify({ error: "Gender and Caste are required fields" }),
+      { status: 400 }
+    );
+  }
+
   const newStudent = await Student.create(data);
-  console.log("Created new student with id", newStudent._id);
   return new Response(JSON.stringify(newStudent), { status: 201 });
 }
 

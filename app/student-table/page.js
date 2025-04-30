@@ -1,12 +1,12 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import jsPDF from 'jspdf';
 import autoTable from "jspdf-autotable";
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import ReactPaginate from 'react-paginate';
-import { Users, FileDown, FileSpreadsheet, Plus, Pencil, Trash2, Search } from 'lucide-react';
+import { Users, FileDown, FileSpreadsheet, Plus, Pencil, Trash2, Search, Printer } from 'lucide-react';
 
 export default function StudentsPage() {
   const [students, setStudents] = useState([]);
@@ -17,11 +17,18 @@ export default function StudentsPage() {
   const [currentPage, setCurrentPage] = useState(0);
   const studentsPerPage = 5;
   const router = useRouter();
+  const tableRef = useRef(null); // Table reference for printing
 
   const fetchStudents = async () => {
-    const res = await fetch('http://localhost:3000/api/students');
-    const data = await res.json();
-    setStudents(data);
+    console.log('Fetching students...');
+    try {
+      const res = await fetch('https://my-next-tailwind-app-inky.vercel.app/api/students');
+      const data = await res.json();
+      console.log('Fetched students:', data);
+      setStudents(data);
+    } catch (error) {
+      console.error('Error fetching students:', error);
+    }
   };
 
   useEffect(() => {
@@ -29,9 +36,15 @@ export default function StudentsPage() {
   }, []);
 
   const handleDelete = async (id) => {
+    console.log('Deleting student with id:', id);
     if (confirm('Are you sure to delete?')) {
-      await fetch(`http://localhost:3000/api/students/${id}`, { method: 'DELETE' });
-      fetchStudents();
+      try {
+        const res = await fetch(`https://my-next-tailwind-app-inky.vercel.app/api/students/${id}`, { method: 'DELETE' });
+        console.log('Deleted student:', res.ok);
+        fetchStudents();
+      } catch (error) {
+        console.error('Error deleting student:', error);
+      }
     }
   };
 
@@ -86,6 +99,20 @@ export default function StudentsPage() {
     saveAs(data, 'students.xlsx');
   };
 
+  const handlePrintTable = () => {
+    const printContent = tableRef.current;
+    const WindowPrt = window.open('', '', 'width=900,height=650');
+    WindowPrt.document.write('<html><head><title>Print</title>');
+    WindowPrt.document.write('<style>table, th, td { border: 1px solid black; border-collapse: collapse; padding: 8px; } th { background-color: #f3f4f6; }</style>');
+    WindowPrt.document.write('</head><body>');
+    WindowPrt.document.write(printContent.outerHTML);
+    WindowPrt.document.write('</body></html>');
+    WindowPrt.document.close();
+    WindowPrt.focus();
+    WindowPrt.print();
+    WindowPrt.close();
+  };
+
   const pageCount = Math.ceil(filteredStudents.length / studentsPerPage);
   const offset = currentPage * studentsPerPage;
   const currentStudents = filteredStudents.slice(offset, offset + studentsPerPage);
@@ -134,7 +161,8 @@ export default function StudentsPage() {
         </select>
       </div>
 
-      <table className="min-w-full mt-4 bg-white shadow rounded-lg">
+      {/* Table */}
+      <table ref={tableRef} className="min-w-full mt-4 bg-white shadow rounded-lg">
         <thead className="bg-gray-200 border-t">
           <tr>
             <th className="px-4 py-2 text-left">S.No</th>
@@ -189,7 +217,11 @@ export default function StudentsPage() {
         />
       </div>
 
+      {/* Bottom Buttons */}
       <div className="flex items-center mb-4 mt-6 gap-4">
+        <button onClick={handlePrintTable} className="bg-purple-600 text-white px-4 py-2 rounded flex items-center cursor-pointer">
+          <Printer size={20} />&nbsp;Print Table
+        </button>
         <button onClick={() => router.push('/add-student')} className="bg-red-500 text-white px-4 py-2 rounded cursor-pointer">Back</button>
         <button onClick={() => router.push('/')} className="bg-gray-500 text-white px-4 py-2 rounded cursor-pointer">Home</button>
       </div>

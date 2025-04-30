@@ -1,3 +1,4 @@
+// Dashboard.js
 'use client';
 import { useEffect, useState } from 'react';
 import {
@@ -8,6 +9,10 @@ import { User,Users} from 'lucide-react';
 import { useRouter } from 'next/navigation';
 //https://my-next-tailwind-app-inky.vercel.app/
 
+
+
+
+
 export default function Dashboard() {
 
   const router = useRouter(); // ✅ Initialize the router
@@ -15,8 +20,10 @@ export default function Dashboard() {
   const [students, setStudents] = useState([]);
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
+ 
+
   const fetchStudents = async () => {
-    const res = await fetch('http://localhost:3000/api/students');
+    const res = await fetch('https://my-next-tailwind-app-inky.vercel.app/api/students');
     const data = await res.json();
     setStudents(data);
   };
@@ -37,9 +44,12 @@ export default function Dashboard() {
     count: students.filter(s => s.admissionYear === year).length,
   }));
 
+
+
+  
+
+
   return (
-
-
 <div className="max-w-7xl mx-auto p-6">
       <h1 className="text-3xl font-bold mb-6 text-center">Student Dashboard</h1>
 
@@ -140,4 +150,16 @@ export default function Dashboard() {
       </div>
  </div>
  );
+
+
+
+
+
+ 
+
+
+
+
+
+
 }

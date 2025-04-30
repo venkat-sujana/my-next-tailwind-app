@@ -1,14 +1,16 @@
+//app/api/add-student/page.js
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Plus, User } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 export default function AddStudentPage() {
   const [formData, setFormData] = useState({
     name: '',
-    email: '',
-    age: '',
-    branch: '',
+    email: '',                               
+    age: '',                                  
+    branch: '',                          
     rollNumber: '',
     admissionYear: '',
     gender: '', // New field
@@ -18,26 +20,36 @@ export default function AddStudentPage() {
   const router = useRouter();
 
   const handleChange = (e) => {
+    console.log('Field name:', e.target.name);
+    console.log('Field value:', e.target.value);
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    console.log('Updated formData:', formData);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log('Form data:', formData);
     if (!formData.gender || !formData.caste) {
+      console.log('Gender and Caste are required fields');
       alert('Gender and Caste are required fields');
       return;
     }
     
-    const res = await fetch('http://localhost:3000/api/students', {
+    const res = await fetch('https://my-next-tailwind-app-inky.vercel.app/api/students', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(formData)
     });
     
+    console.log('Response:', res);
     if (res.ok) {
-      router.push('/student-table');
+      toast.success('Student added successfully!');
+      setTimeout(() => {   // 1 sec తర్వాత navigate అవుతుంది
+        router.push('/student-table');
+      }, 1000);
     } else {
-      alert('Failed to add student');
+      const errorData = await res.json();
+      toast.error(errorData.message || 'Failed to add student!');
     }
   };
 
@@ -101,7 +113,11 @@ export default function AddStudentPage() {
         <div className="flex items-center mb-4">
           <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded flex items-center cursor-pointer">
             <Plus size={20} color='white'/> Add
-          </button>
+          </button>&nbsp;
+          <button onClick={() => router.push('/student-table')} className="bg-red-500 text-white px-4 py-2 rounded flex items-center cursor-pointer">Cancel</button>&emsp;
+
+        <button onClick={() => router.push('/')} className="bg-gray-500 text-white px-4 py-2 rounded flex items-center cursor-pointer">Home</button>
+
           {/* ... other buttons ... */}
         </div>
         {/* ... terms checkbox ... */}

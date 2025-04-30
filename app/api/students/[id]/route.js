@@ -1,10 +1,11 @@
+// app/api/students/[id]/route.js
 import connectMongoDB from "@/lib/db";
 import Student from "@/models/Student";
 
 // GET one student (with new fields)
 export async function GET(_, { params }) {
   await connectMongoDB();
-  const student = await Student.findById(params.id).select('name email gender caste');
+  const student = await Student.findById(params.id).select('name email gender caste age branch rollNumber admissionYear');
   if (!student) {
     return new Response(JSON.stringify({ error: "Student not found" }), { status: 404 });
   }

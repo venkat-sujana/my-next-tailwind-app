@@ -1,21 +1,20 @@
 import mongoose from "mongoose";
-
 const StudentSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
     trim: true,
   },
-  email: {
+  email: {                                
     type: String,
     required: true,
     unique: true,
   },
-  age: {
+  age: {                               
     type: Number,
     required: true,
   },
-  branch: {
+  branch: {                   
     type: String,
     required: true,
   },
@@ -31,14 +30,15 @@ const StudentSchema = new mongoose.Schema({
   // New fields added below
   gender: {
     type: String,
-    // required: true,
+    required: true,
     enum: ["Male", "Female", "Other"], // Allowed values
   },
   caste: {
     type: String,
-    // required: true,
+    required: true,
     enum: ["OC", "SC", "ST", "BC", "Other"], // Allowed values
   },
 }, { timestamps: true });
 
 export default mongoose.models.Student || mongoose.model("Student", StudentSchema);
+

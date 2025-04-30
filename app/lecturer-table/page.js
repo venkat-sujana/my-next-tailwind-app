@@ -254,7 +254,7 @@ export default function LecturersPage() {
           <Printer size={20} />&nbsp;Print Table
         </button>
         <button onClick={() => router.push('/add-lecturer')} className="bg-red-500 text-white px-4 py-2 rounded cursor-pointer">Back</button>
-        <button onClick={() => router.push('/')} className="bg-gray-500 text-white px-4 py-2 rounded cursor-pointer">Home</button>
+        <button onClick={() => router.push('/lecturer-dashboard')} className="bg-gray-500 text-white px-4 py-2 rounded cursor-pointer">Home</button>
       </div>
     </div>
 
